@@ -1,11 +1,23 @@
-.container{
+.Container{
     background: #72d6f5!important;
     height : 50px;
     margin-left: 0%;
-    text-align: justify;
     color : white;
     font-weight: bold;
     font-size: larger;
     vertical-align: middle;
     width : 100%
+}
+
+.Footer{
+    background: #72d6f5!important;
+    height : 50px;
+    margin-left: 0%;
+    text-align: center;
+    color : white;
+    font-weight: bold;
+    font-size: larger;
+    vertical-align: middle;
+    width : 100%
+
 }

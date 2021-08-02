@@ -1,7 +1,6 @@
 import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
 import './App.scss';
-import FetchData from './Components/FetchData';
+import ListUsers from './Components/ListUsers';
 import { Switch, Route } from 'react-router-dom';
 import UserDetails from './Components/UserDetails';
 
@@ -9,14 +8,14 @@ import UserDetails from './Components/UserDetails';
 function App() {
   return (
     <>
-      <Container  className='container-lg mt-3'>
+      <header  className='Container mt-3'>
         My App
-      </Container>
+      </header>
       <Switch>
-        <Route exact path='/' component={FetchData} />
-        <Route path='/userDetails/:id' component={UserDetails} />
+        <Route exact path='/' component={ListUsers} />
+        <Route path='/userDetails/:phoneNum' component={UserDetails} />
       </Switch>
-      <footer>
+      <footer className='Footer mt-3' >
         Copyright
       </footer>
     </>

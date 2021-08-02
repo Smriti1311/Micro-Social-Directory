@@ -1,84 +1,104 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import { Table } from 'react-bootstrap';
-//import UserDetails from './UserDetails';
-import { useHistory } from 'react-router-dom';
+import axios from 'axios';
+import { withRouter } from 'react-router';
 import ReactPaginate from 'react-paginate';
 import './ListUsers.scss';
 
-function ListUsers(props) {
-    const [pageNumber, setPageNumber] = useState(0);
-
-    const usersPerPage = 24;
-    const usersVisited = pageNumber * usersPerPage;
-    let serialNumber = ( pageNumber ) * usersPerPage;
-
-    const usersOnCurrentPage = props.usersData.slice(usersVisited, usersVisited + usersPerPage);
-    
-    //TODO: Why its not setting the initial value on displayUsersOnPage
-    const [displayUsersOnPage, setdisplayUsersOnPage] = useState(usersOnCurrentPage);
-    console.log(displayUsersOnPage);
-    //setdisplayUsersOnPage(usersOnCurrentPage);
-    const sortUsersHandler = () => {
-        console.log('sort user handler');
-      //  usersOnCurrentPage.map((user)=>(console.log(user.name)));
-
-       usersOnCurrentPage.sort((a,b)=>(a.name.first > b.name.first ? 1 : -1));
-     console.log(usersOnCurrentPage);
-
-     // sortedUsersList.map((user)=>(console.log(user.name)));
-   //  usersOnCurrentPage.sort((a,b)=>(a.name > b.name ? 1 : -1));
-    // displayUsers();
-
+const usersPerPage = 24;
+class ListUsers extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            usersData: [],
+            displayUsersOnPage: [],
+            pageNumber: 0,
+            sortImage: './media/sort-asc.png'
+        }
     }
 
-      const displayUsers = usersOnCurrentPage
-        .map((user, index) => {
-            serialNumber = serialNumber + 1;
-            return <tr key={index} >
-                <td>{serialNumber}</td>
-                <td>{user.name.first + ' ' + user.name.last}</td>
-                <td><img src={user.picture.thumbnail} alt={user.title} onClick={sortUsersHandler}/></td>
-            </tr>
-        })
+    componentDidMount() {
+        axios.get('https://randomuser.me/api/?results=100')
+            .then(response => {
+                const usersData = response.data.results;
+                this.setState({
+                    usersData: usersData,
+                    displayUsersOnPage: usersData.slice(0, usersPerPage)
+                });
+            })
+    }
 
-        const totalUsers = props.usersData.length;
+    sortUsersHandler = () => {
+        if (this.state.sortImage === './media/sort-asc.png') {
+            this.setState({
+                displayUsersOnPage: this.state.displayUsersOnPage.sort(
+                    (a, b) => (a.name.first > b.name.first ? 1 : -1)),
+                sortImage: './media/sort-desc.png'
+            })
+        } 
+        else {
+            this.setState({
+                displayUsersOnPage: this.state.displayUsersOnPage.sort(
+                    (a, b) => (a.name.first < b.name.first ? 1 : -1)),
+                sortImage: './media/sort-asc.png'
+            })
+        }
+    }
+
+    changePageHandler = ({ selected }) => {
+        const usersVisited = selected * usersPerPage;
+        this.setState({
+            pageNumber: selected,
+            displayUsersOnPage: this.state.usersData.slice(usersVisited, usersVisited + usersPerPage)
+        });
+    }
+
+    userDetailsHandler = (userPhoneNum) => {
+        this.props.history.push(`/userDetails/${userPhoneNum}`);
+    }
+
+    render() {
+        const { pageNumber, usersData, displayUsersOnPage, sortImage } = this.state;
+        let serialNumber = (pageNumber) * usersPerPage;
+        const totalUsers = usersData.length;
         const pageCount = Math.ceil(totalUsers / usersPerPage);
-
-    const changePageHandler = ({ selected }) => {
-        console.log(selected);
-        setPageNumber(selected);
-      //  setusersOnCurrentPage( props.usersData.slice(usersVisited, usersVisited + usersPerPage));
+        const displayUsers = displayUsersOnPage
+            .map((user, index) => {
+                serialNumber = serialNumber + 1;
+                return <tr key={index} onClick={() => this.userDetailsHandler(user.phone)}>
+                    <td>{serialNumber}</td>
+                    <td>{user.name.first + ' ' + user.name.last}</td>
+                    <td><img src={user.picture.thumbnail} alt={user.title} /></td>
+                </tr>
+            })
+        return (
+            <>
+                <Table bordered hover className=' w-75 mx-auto my-5 text-center'>
+                    <thead>
+                        <tr>
+                            <th>S.No.</th>
+                            <th>Name<img src={sortImage} alt='Sort' height='25px' onClick={this.sortUsersHandler}></img></th>
+                            <th>Picture</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {displayUsers}
+                    </tbody>
+                </Table>
+                <ReactPaginate
+                    previousLabel='Previous'
+                    nextLabel='Next'
+                    pageCount={pageCount}
+                    onPageChange={this.changePageHandler}
+                    containerClassName={"paginationBttns"}
+                    previousLinkClassName={"previousBttn"}
+                    nextLinkClassName={"nextBttn"}
+                    disabledClassName={"paginationDisabled"}
+                    activeClassName={"paginationActive"}
+                />
+            </>
+        );
     }
-
-   
-
-    return (
-        <>
-            <Table  bordered hover className=' w-75 mx-auto my-5 text-center'>
-                <thead>
-                    <tr>
-                        <th>S.No.</th>
-                        <th>Name<img src='./media/sort-asc.png' height='25px' onClick={sortUsersHandler}></img></th>
-                        <th>Picture</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {displayUsers}
-                </tbody>
-            </Table>
-            <ReactPaginate
-                previousLabel='Previous'
-                nextLabel='Next'
-                pageCount={pageCount}
-                onPageChange={changePageHandler}
-                containerClassName={"paginationBttns"}
-                previousLinkClassName={"previousBttn"}
-                nextLinkClassName={"nextBttn"}
-                disabledClassName={"paginationDisabled"}
-                activeClassName={"paginationActive"}
-            />
-        </>
-    );
 }
 
-export default ListUsers;
+export default withRouter(ListUsers);
