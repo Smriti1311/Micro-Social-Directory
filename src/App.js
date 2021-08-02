@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { Component } from 'react';
 import './App.scss';
 import ListUsers from './Components/ListUsers';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, withRouter } from 'react-router-dom';
 import UserDetails from './Components/UserDetails';
 
+class App extends Component {
 
-function App() {
+ 
+  render(){
   return (
     <>
-      <header  className='Container mt-3'>
+      <header className='Container mt-3 pl-2'>
         My App
       </header>
       <Switch>
@@ -21,5 +23,6 @@ function App() {
     </>
   );
 }
+}
 
-export default App;
+export default withRouter(App);

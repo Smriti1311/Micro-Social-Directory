@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table } from 'react-bootstrap';
+import { OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 import axios from 'axios';
 import { withRouter } from 'react-router';
 import ReactPaginate from 'react-paginate';
@@ -35,7 +35,7 @@ class ListUsers extends Component {
                     (a, b) => (a.name.first > b.name.first ? 1 : -1)),
                 sortImage: './media/sort-desc.png'
             })
-        } 
+        }
         else {
             this.setState({
                 displayUsersOnPage: this.state.displayUsersOnPage.sort(
@@ -57,6 +57,12 @@ class ListUsers extends Component {
         this.props.history.push(`/userDetails/${userPhoneNum}`);
     }
 
+    renderTooltip = (props) => (
+        <Tooltip id="button-tooltip" {...props}>
+          {this.state.sortImage === './media/sort-asc.png' ? 'Sort By Name(Ascending)' : 'Sort By Name(Descending)'}
+        </Tooltip>
+      );
+
     render() {
         const { pageNumber, usersData, displayUsersOnPage, sortImage } = this.state;
         let serialNumber = (pageNumber) * usersPerPage;
@@ -77,7 +83,14 @@ class ListUsers extends Component {
                     <thead>
                         <tr>
                             <th>S.No.</th>
-                            <th>Name<img src={sortImage} alt='Sort' height='25px' onClick={this.sortUsersHandler}></img></th>
+                            <th>Name
+                                <OverlayTrigger placement="right"
+                                    delay={{ show: 250, hide: 400 }}
+                                    overlay={this.renderTooltip}>
+                                    <img src={sortImage} alt='Sort' height='25px'
+                                        onClick={this.sortUsersHandler}></img>
+                                </OverlayTrigger>
+                            </th>
                             <th>Picture</th>
                         </tr>
                     </thead>
