@@ -51,6 +51,7 @@ class ListUsers extends Component {
             pageNumber: selected,
             displayUsersOnPage: this.state.usersData.slice(usersVisited, usersVisited + usersPerPage)
         });
+        window.scrollTo(0,0);
     }
 
     userDetailsHandler = (userPhoneNum) => {
